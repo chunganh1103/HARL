@@ -18,4 +18,6 @@ CRITIC_REGISTRY = {
     "had3qn": DiscreteQCritic,
     "maddpg": ContinuousQCritic,
     "matd3": TwinContinuousQCritic,
+    "hatd3_sinkhorn": TwinContinuousQCritic,
+    "hatd3_sinkhorn_igm": TwinContinuousQCritic,
 }

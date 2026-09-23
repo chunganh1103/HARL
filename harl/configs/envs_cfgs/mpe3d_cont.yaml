@@ -1,0 +1,20 @@
+env: mpe3d_cont
+env_args:
+  # task sizing
+  n_ugv: 4
+  n_evader: 2
+  map_size: [100, 100, 30]
+  episode_limit: 800
+
+  # control & scaling
+  action_clip: 1.0
+  reward_scale: 1.0
+  done_on_capture: false
+
+  # video (off for training; enable for eval)
+  record_video_2d: false
+  record_video_3d: false
+  video_file: ./videos/mpe3d_run.mp4
+
+# optional: seeding
+seed: 0

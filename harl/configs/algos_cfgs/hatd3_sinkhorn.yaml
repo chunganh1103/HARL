@@ -1,0 +1,75 @@
+# HATD3 + HAML(Sinkhorn-HADF) configuration
+seed:
+  seed_specify: True
+  seed: 1
+
+device:
+  cuda: True
+  cuda_deterministic: True
+  torch_threads: 4
+
+train:
+  n_rollout_threads: 10
+  num_env_steps: 10000000
+  warmup_steps: 10000
+  train_interval: 50
+  update_per_train: 1
+  log_interval: ~
+  eval_interval: 10000
+  use_linear_lr_decay: False
+  use_proper_time_limits: True
+  model_dir: ~
+
+eval:
+  use_eval: True
+  n_eval_rollout_threads: 20
+  eval_episodes: 40
+
+render:
+  use_render: False
+  render_episodes: 10
+
+model:
+  hidden_sizes: [128, 128]
+  activation_func: relu
+  final_activation_func: tanh         # keep actions in [-1,1]
+  lr: 0.0005
+  critic_lr: 0.001
+
+algo:
+  # TD3 backbone
+  gamma: 0.99
+  buffer_size: 1000000
+  batch_size: 512                    # ↓ from 1000 (OT is O(B^2))
+  polyak: 0.005
+  expl_noise: 0.1
+  policy_noise: 0.2
+  noise_clip: 0.5
+  policy_freq: 2
+  n_step: 1
+  share_param: False
+  fixed_order: False                 # keep random per-iteration order (HAML)
+  max_grad_norm: 10.0
+
+  # ===== HAML HADF: Sinkhorn divergence on pushforward actions =====
+  sinkhorn:
+    enabled: true                    # turn on Sinkhorn-HADF penalty in actor loss
+    # penalty vs. trust-region (dual). If use_dual=false, lam is fixed.
+    use_dual: true
+    lam: 0.10                        # initial penalty weight (used if use_dual=false)
+    radius: 0.10                     # target sqrt(Sinkhorn) per update (1–5% action range)
+    dual_lr: 0.01                    # step size for lambda
+
+    # geometry / solver (GeomLoss-style params)
+    p: 2
+    blur: 0.05                       # entropic strength (ε = blur^p)
+    scaling: 0.8                     # controls internal Sinkhorn iterations
+    backend: auto                    # 'auto' | 'tensorized' | 'online'
+
+    # optional weighting / cost shaping
+    weighted_marginals: false        # set true if you pass state-weights
+    ground_metric: euclidean         # 'euclidean' | 'mahalanobis'
+    ground_metric_diag: ~            # e.g., [1.0, 0.5, ...] if using mahalanobis
+
+logger:
+  log_dir: "./results"

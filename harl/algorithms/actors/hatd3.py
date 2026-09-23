@@ -6,7 +6,7 @@ from harl.algorithms.actors.haddpg import HADDPG
 
 class HATD3(HADDPG):
     def __init__(self, args, obs_space, act_space, device=torch.device("cpu")):
-        super().__init__(args, obs_space, act_space, device)
+        super(HATD3, self).__init__(args, obs_space, act_space, device)
         self.policy_noise = args["policy_noise"]
         self.noise_clip = args["noise_clip"]
 

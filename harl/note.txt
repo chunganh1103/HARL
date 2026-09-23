@@ -1,0 +1,83 @@
+conda activate anhntc_harl
+cd /ESSD1/anhntc/UGV/HARL/examples
+
+command-line arguments parsed by argparse. Three keys: algo, env, exp_name.
+
+____________________________________________________________________________________________
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/haddpg/config.json --exp_name haddpg_ContinuousAction
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/hatd3/config.json --exp_name hatd3_ContinuousAction
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/hatd3_sinkhorn/config.json --exp_name hatd3_sinkhorn_ContinuousAction
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/hatd3_sinkhorn/config1.json --exp_name hatd3_sinkhorn_lam05_ContinuousAction
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/hatd3_sinkhorn/config4_sinkhorn_soft.json --exp_name hatd3_config4_sinkhorn_soft_ContinuousAction
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/hatd3_sinkhorn/config4_sinkhorn_hard_proj_v8.json --exp_name config4_sinkhorn_hard
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/hatd3_sinkhorn/config4_sinkhorn_hard_dual_cf0.json --exp_name config4_sinkhorn_hard_dual_cf0
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/hatd3_sinkhorn_igm/config4_sinkhorn_hard_dual_cf0.json --exp_name config4_sinkhorn_igm_hard_dual_cf0
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_spread_v2-continuous/hatd3_sinkhorn_igm/config4_sinkhorn_hard_proj.json --exp_name config4_sinkhorn_igm_hard_proj
+____________________________________________________________________________________________
+
+#### Environment: MPE, Scenarior: simple_reference_v2
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_reference_v2-continuous/hatd3/config.json --exp_name hatd3_simple_reference_v2-continuous
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_reference_v2-continuous/haddpg/config.json --exp_name haddpg_simple_reference_v2-continuous
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_reference_v2-continuous/sinkhorn/config_0.json --exp_name cf0_hatd3_sinkhorn_simple_reference_v2-continuous
+
+____________________________________________________________________________________________
+#### Environment: MPE, Scenarior: simple_reference_v2
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_speaker_listener_v3-continuous/happo/config.json --exp_name happo
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/pettingzoo_mpe/simple_speaker_listener_v3-continuous/mappo/config.json --exp_name mappo
+____________________________________________________________________________________________
+#### Environment: mamujoco, Scenarior:Walker2d-v2-6x1
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Walker2d-v2-6x1/hatd3/config.json --exp_name hatd3-Walker2d-v2-6x1
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Walker2d-v2-6x1/matd3/config.json --exp_name matd3-Walker2d-v2-6x1
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Walker2d-v2-6x1/hatd3_sinkhorn/config_hard_dual_constraint.json --exp_name config_hard_dual_constraint
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Walker2d-v2-6x1/hatd3_sinkhorn/config_hard_proj.json --exp_name config_hard_proj
+
+____________________________________________________________________________________________
+#### Environment: mamujoco, Scenarior:Hopper-v2-3x1
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Hopper-v2-3x1/maddpg/config.json --exp_name maddpg
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Hopper-v2-3x1/matd3/config.json --exp_name matd3
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Hopper-v2-3x1/haddpg/config.json --exp_name haddpg
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Hopper-v2-3x1/hatd3/config.json --exp_name hatd3
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Hopper-v2-3x1/hatd3_sinkhorn/config_dual.json --exp_name hatd3_sinkhorn_dual
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/mamujoco/Hopper-v2-3x1/hatd3_sinkhorn/config_proj.json --exp_name hatd3_sinkhorn_proj
+
+____________________________________________________________________________________________
+#### Environment: starcrafII, Scenarior:3s5z_vs_3s6z
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/smac/3s5z_vs_3s6z/happo/config.json  --exp_name happo
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/smac/3s5z_vs_3s6z/hatrpo/config.json  --exp_name hatrpo
+
+python train.py --load_config /ESSD1/anhntc/UGV/HARL/tuned_configs/smac/3s5z/happo/config.json  --exp_name happo
+
+
+conda activate anhntc_epymarl
+cd /ESSD1/anhntc/UGV/HARL
+
+python examples/train.py --algo hatd3_sinkhorn --env mpe3d_cont --exp_name mpe3d_hatd3_sinkhorn
+
+python examples/train.py --algo hatd3 --env mpe3d_cont --exp_name mpe3d_hatd3
+
+python examples/train.py --algo matd3 --env mpe3d_cont --exp_name mpe3d_matd3
+
+python examples/train.py --algo maddpg --env mpe3d_cont --exp_name mpe3d_maddpg

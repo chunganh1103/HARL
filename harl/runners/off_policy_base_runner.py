@@ -20,7 +20,7 @@ from harl.algorithms.actors import ALGO_REGISTRY
 from harl.algorithms.critics import CRITIC_REGISTRY
 from harl.common.buffers.off_policy_buffer_ep import OffPolicyBufferEP
 from harl.common.buffers.off_policy_buffer_fp import OffPolicyBufferFP
-
+from tqdm import tqdm
 
 class OffPolicyBaseRunner:
     """Base runner for off-policy algorithms."""
@@ -132,6 +132,17 @@ class OffPolicyBaseRunner:
                     device=self.device,
                 )
                 self.actor.append(agent)
+        # define old actor that is copied from current actor
+        # self.old_actor = []
+        # for agent_id in range(self.num_agents):
+        #     agent = ALGO_REGISTRY[args["algo"]](
+        #         {**algo_args["model"], **algo_args["algo"]},
+        #         self.envs.observation_space[agent_id],
+        #         self.envs.action_space[agent_id],
+        #         device=self.device,
+        #     )
+        #     agent.load_state_dict(self.actor[agent_id].state_dict())
+        #     self.old_actor.append(agent)
 
         if not self.algo_args["render"]["use_render"]:
             self.critic = CRITIC_REGISTRY[args["algo"]](
@@ -228,7 +239,7 @@ class OffPolicyBaseRunner:
             self.algo_args["train"]["update_per_train"]
             * self.algo_args["train"]["train_interval"]
         )
-        for step in range(1, steps + 1):
+        for step in tqdm(range(1, steps + 1)):
             actions = self.get_actions(
                 obs, available_actions=available_actions, add_random=True
             )
@@ -274,7 +285,8 @@ class OffPolicyBaseRunner:
                         for agent_id in range(self.num_agents):
                             self.actor[agent_id].lr_decay(step, steps)
                     self.critic.lr_decay(step, steps)
-                for _ in range(update_num):
+                for i_update_num in range(update_num):
+                    # print(f"** i_update_num:{i_update_num}")
                     self.train()
             if step % self.algo_args["train"]["eval_interval"] == 0:
                 cur_step = (
@@ -528,7 +540,7 @@ class OffPolicyBaseRunner:
             eval_score_cnt = 0
         episode_lens = []
         one_episode_len = np.zeros(
-            self.algo_args["eval"]["n_eval_rollout_threads"], dtype=np.int
+            self.algo_args["eval"]["n_eval_rollout_threads"], dtype=int
         )
 
         eval_obs, eval_share_obs, eval_available_actions = self.eval_envs.reset()
@@ -640,15 +652,25 @@ class OffPolicyBaseRunner:
 
     @torch.no_grad()
     def render(self):
-        """Render the model"""
-        print("start rendering")
+        """Render rollouts and save videos to disk."""
+        import os, time, numpy as np
+        import imageio.v2 as iio
+
+        cfg = self.algo_args.get("render", {})
+        mode = str(cfg.get("mode", "rgb_array")).lower()         # "rgb_array" or "human"
+        fps = int(cfg.get("fps", 30))
+        out_dir = str(self.algo_args["train"]["model_dir"]) + "/render_videos"        
+        os.makedirs(out_dir, exist_ok=True)
+
+        print(f"[render] saving videos to {out_dir}, mode: {mode}, fps: {fps}")
         if self.manual_expand_dims:
             # this env needs manual expansion of the num_of_parallel_envs dimension
-            for _ in range(self.algo_args["render"]["render_episodes"]):
+            for eps in range(self.algo_args["render"]["render_episodes"]):
                 eval_obs, _, eval_available_actions = self.envs.reset()
                 eval_obs = np.expand_dims(np.array(eval_obs), axis=0)
                 eval_available_actions = np.array([eval_available_actions])
                 rewards = 0
+                eps_frames = []
                 while True:
                     eval_actions = self.get_actions(
                         eval_obs,
@@ -667,18 +689,36 @@ class OffPolicyBaseRunner:
                     eval_obs = np.expand_dims(np.array(eval_obs), axis=0)
                     eval_available_actions = np.array([eval_available_actions])
                     if self.manual_render:
-                        self.envs.render()
+                        if mode == "human":
+                            # Opens a window; nothing to save
+                            self.envs.render(mode=mode)
+                        elif mode == "rgb_array":
+                            frames = self.envs.render(mode=mode) 
+                            print(f"frames type: {type(frames)}, {frames}")
+                            if frames is not None:
+                                eps_frames.append(frames[0])  # only save the first env's frames
                     if self.manual_delay:
                         time.sleep(0.1)
                     if eval_dones[0]:
                         print(f"total reward of this episode: {rewards}")
                         break
+                if mode == "rgb_array" and len(eps_frames) > 0:
+                    video_path = os.path.join(out_dir, f"episode_{eps+1}.mp4")
+                    iio.mimwrite(
+                        video_path,
+                        eps_frames,
+                        fps=fps,
+                        quality=8,
+                        macro_block_size=None,
+                    )
+                    print(f"[render] video of episode {eps+1} saved to {video_path}")
         else:
             # this env does not need manual expansion of the num_of_parallel_envs dimension
             # such as dexhands, which instantiates a parallel env of 64 pair of hands
-            for _ in range(self.algo_args["render"]["render_episodes"]):
+            for eps in range(self.algo_args["render"]["render_episodes"]):
                 eval_obs, _, eval_available_actions = self.envs.reset()
                 rewards = 0
+                eps_frames = []
                 while True:
                     eval_actions = self.get_actions(
                         eval_obs,
@@ -695,17 +735,34 @@ class OffPolicyBaseRunner:
                     ) = self.envs.step(eval_actions)
                     rewards += eval_rewards[0][0][0]
                     if self.manual_render:
-                        self.envs.render()
+                        if mode == "human":
+                            # Opens a window; nothing to save
+                            self.envs.render(mode=mode)
+                        elif mode == "rgb_array":
+                            frames = self.envs.render(mode=mode)
+                            eps_frames.append(frames[0])  # only save the first env's frames
                     if self.manual_delay:
                         time.sleep(0.1)
                     if eval_dones[0][0]:
                         print(f"total reward of this episode: {rewards}")
                         break
+                if mode == "rgb_array":
+                    video_path = os.path.join(out_dir, f"episode_{eps+1}.mp4")
+                    iio.mimwrite(
+                        video_path,
+                        eps_frames,
+                        fps=fps,
+                        quality=8,
+                        macro_block_size=None,
+                    )
+                    print(f"[render] video of episode {eps+1} saved to {video_path}")
+
         if "smac" in self.args["env"]:  # replay for smac, no rendering
             if "v2" in self.args["env"]:
                 self.envs.env.save_replay()
             else:
                 self.envs.save_replay()
+
 
     def restore(self):
         """Restore the model"""

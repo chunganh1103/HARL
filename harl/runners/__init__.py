@@ -15,4 +15,6 @@ RUNNER_REGISTRY = {
     "maddpg": OffPolicyMARunner,
     "matd3": OffPolicyMARunner,
     "mappo": OnPolicyMARunner,
+    "hatd3_sinkhorn": OffPolicyHARunner,
+    "hatd3_sinkhorn_igm": OffPolicyHARunner,
 }

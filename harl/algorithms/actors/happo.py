@@ -53,6 +53,7 @@ class HAPPO(OnPolicyBase):
         factor_batch = check(factor_batch).to(**self.tpdv)
 
         # Reshape to do evaluations for all steps in a single forward pass
+        # use current policy to evaluate actions
         action_log_probs, dist_entropy, _ = self.evaluate_actions(
             obs_batch,
             rnn_states_batch,
@@ -63,6 +64,7 @@ class HAPPO(OnPolicyBase):
         )
 
         # actor update
+        # use log( pi_theta / pi_theta__old)
         imp_weights = getattr(torch, self.action_aggregation)(
             torch.exp(action_log_probs - old_action_log_probs_batch),
             dim=-1,

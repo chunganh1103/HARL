@@ -24,6 +24,7 @@ def main():
             "maddpg",
             "matd3",
             "mappo",
+            "hatd3_sinkhorn",
         ],
         help="Algorithm name. Choose from: happo, hatrpo, haa2c, haddpg, hatd3, hasac, had3qn, maddpg, matd3, mappo.",
     )
@@ -40,6 +41,7 @@ def main():
             "dexhands",
             "smacv2",
             "lag",
+            "mpe3d_cont",
         ],
         help="Environment name. Choose from: smac, mamujoco, pettingzoo_mpe, gym, football, dexhands, smacv2, lag.",
     )
